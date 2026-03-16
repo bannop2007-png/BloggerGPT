@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BloggerGPT · AI Chat Studio</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">BG</div>
+        <div>
+          <div class="brand-name">BloggerGPT</div>
+          <div class="muted tiny">AI-чат студия</div>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <div class="theme-select">
+          <label for="theme-select">Тема</label>
+          <select id="theme-select">
+            <option value="aurora" selected>Аврора</option>
+            <option value="carbon">Карбон</option>
+            <option value="paper">Бумага</option>
+          </select>
+        </div>
+        <div class="model-select">
+          <label for="model-select">Модель</label>
+          <select id="model-select">
+            <option value="openai/gpt-4o" selected>GPT-4o</option>
+            <option value="openai/gpt-4o-mini">GPT-4o mini</option>
+            <option value="deepseek/deepseek-chat">DeepSeek</option>
+            <option value="meta-llama/llama-3.1-8b-instruct">Llama</option>
+          </select>
+        </div>
+        <div class="auth-mini">
+          <span class="muted tiny" id="auth-status">Гость</span>
+          <button class="ghost small" id="auth-open">Войти</button>
+          <button class="ghost small" id="auth-logout" hidden>Выйти</button>
+        </div>
+        <button class="ghost" id="clear">Новый чат</button>
+      </div>
+    </header>
+
+    <main class="stage">
+      <section class="chat">
+        <div class="chat-header">
+          <div>
+            <div class="eyebrow">Диалог</div>
+            <h2>Чат с BloggerGPT</h2>
+          </div>
+          <div class="status" id="loading-indicator">BloggerGPT думает...</div>
+        </div>
+
+        <div class="messages" id="chat-history"></div>
+
+        <div class="composer">
+          <div class="tools-row">
+            <label class="tool">
+              <input type="file" id="chat-image" accept="image/*">
+              <span>Фото</span>
+            </label>
+            <button class="ghost small" id="voice-toggle">Говорить</button>
+            <span class="muted tiny" id="voice-status">микрофон выключен</span>
+            <div class="spacer"></div>
+          </div>
+          <div class="input-row">
+            <textarea id="chat-input" rows="2" placeholder="Напишите сообщение..."></textarea>
+            <button class="primary" id="chat-send">Отправить</button>
+          </div>
+          <div class="quick-prompts">
+            <button class="chip" data-prompt="Придумай бизнес идею">Придумай бизнес идею</button>
+            <button class="chip" data-prompt="Напиши код на JavaScript">Напиши код на JavaScript</button>
+            <button class="chip" data-prompt="Объясни сложную тему простыми словами">Объясни сложную тему</button>
+            <button class="chip" data-prompt="Напиши пост для соцсетей">Напиши пост для соцсетей</button>
+          </div>
+        </div>
+      </section>
+
+      <aside class="side">
+        <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">Бриф</div>
+        </div>
+        <div class="brief-ai">
+          <textarea id="brief-idea" rows="2" placeholder="Коротко опишите задачу для AI (например: пост про личный бренд)"></textarea>
+          <button class="ghost small" id="brief-ai">AI заполнить бриф</button>
+          <div class="muted tiny" id="brief-status"></div>
+        </div>
+        <label class="field">
+          <span>Тема</span>
+            <textarea id="topic" rows="3" placeholder="Например: Как вести блог, если нет времени"></textarea>
+          </label>
+          <label class="field">
+            <span>Тон</span>
+            <div class="chips" id="tone">
+              <button class="chip active" data-value="дружелюбный">Дружелюбный</button>
+              <button class="chip" data-value="экспертный">Экспертный</button>
+              <button class="chip" data-value="провокационный">Провокационный</button>
+              <button class="chip" data-value="лаконичный">Лаконичный</button>
+            </div>
+          </label>
+          <label class="field">
+            <span>Длина</span>
+            <div class="chips" id="length">
+              <button class="chip active" data-value="коротко">Коротко</button>
+              <button class="chip" data-value="средне">Средне</button>
+              <button class="chip" data-value="подробно">Подробно</button>
+            </div>
+          </label>
+          <label class="field">
+            <span>Формат</span>
+            <div class="chips" id="format">
+              <button class="chip active" data-value="пост">Пост</button>
+              <button class="chip" data-value="видео сценарий">Видео</button>
+              <button class="chip" data-value="подкаст">Подкаст</button>
+              <button class="chip" data-value="рассылка">Рассылка</button>
+            </div>
+          </label>
+          <button class="primary full" id="generate-all">Сгенерировать всё</button>
+        </div>
+
+        <div class="panel">
+          <div class="block">
+            <div class="card-header">
+              <div>
+                <div class="eyebrow">Заголовки</div>
+                <h3>5 вариантов</h3>
+              </div>
+              <button class="ghost small" data-copy="titles">Копировать</button>
+            </div>
+            <ul id="titles" class="list"></ul>
+          </div>
+          <div class="block">
+            <div class="card-header">
+              <div>
+                <div class="eyebrow">Интро</div>
+                <h3>Лид или хук</h3>
+              </div>
+              <button class="ghost small" data-copy="hook">Копировать</button>
+            </div>
+            <div id="hook" class="text-block"></div>
+          </div>
+          <div class="block">
+            <div class="card-header">
+              <div>
+                <div class="eyebrow">Структура</div>
+                <h3>План поста</h3>
+              </div>
+              <button class="ghost small" data-copy="outline">Копировать</button>
+            </div>
+            <ol id="outline" class="list ordered"></ol>
+          </div>
+          <div class="block">
+            <div class="card-header">
+              <div>
+                <div class="eyebrow">SEO</div>
+                <h3>Ключи</h3>
+              </div>
+            </div>
+            <ul id="keywords" class="list inline"></ul>
+            <div class="card-header" style="margin-top:12px">
+              <div>
+                <div class="eyebrow">CTA</div>
+                <h3>Призывы</h3>
+              </div>
+            </div>
+            <ul id="cta" class="list inline"></ul>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="footer">
+      <div>BloggerGPT Studio v0.3</div>
+      <div class="muted">AI-чат с историей, быстрыми запросами и выбором модели.</div>
+    </footer>
+  </div>
+
+  <div class="modal" id="auth-modal" aria-hidden="true">
+    <div class="modal-backdrop" data-auth-close></div>
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <div class="eyebrow">Аккаунт</div>
+          <h3>Вход или регистрация</h3>
+        </div>
+        <button class="ghost small" data-auth-close>Закрыть</button>
+      </div>
+      <div id="auth-guest" class="auth-guest">
+        <label class="field">
+          <span>Email</span>
+          <input type="email" id="auth-email" placeholder="you@example.com">
+        </label>
+        <label class="field">
+          <span>Пароль</span>
+          <input type="password" id="auth-password" placeholder="Минимум 6 символов">
+        </label>
+        <div class="auth-actions">
+          <button class="primary" id="auth-login">Войти</button>
+          <button class="ghost" id="auth-signup">Регистрация</button>
+        </div>
+        <div class="muted tiny" id="auth-message"></div>
+      </div>
+      <div id="auth-logged" class="auth-logged" hidden>
+        <div class="muted tiny">Вы вошли как <span id="profile-email"></span></div>
+        <label class="field">
+          <span>Имя в профиле</span>
+          <input type="text" id="profile-name" placeholder="Например: Alex">
+        </label>
+        <button class="primary" id="profile-save">Сохранить профиль</button>
+        <div class="muted tiny" id="profile-message"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
